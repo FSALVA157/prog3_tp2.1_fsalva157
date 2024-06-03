@@ -47,50 +47,76 @@ class Customer {
 } //cierre de clase Customer
 
 class Reservation {
-  static validate(id, customer, date, guests) {
+  constructor(id, customer, date, guests) {
     if (typeof id !== "number") {
-      console.log("El ID debe ser un número entero");
-      return false;
+      throw new Error("El ID debe ser un número entero");
     }
     if (!(customer instanceof Customer)) {
-      console.log("El cliente tiene algún dato incorrecto");
-      return false;
+      throw new Error("El cliente tiene algún dato incorrecto");
     }
+
+    if (typeof date !== "string") {
+      throw new Error("La fecha debe ser una cadena de texto");
+    } else {
+      let dateObj = new Date(date);
+      if (isNaN(dateObj.getTime())) {
+        throw new Error("La fecha no tiene el formato correcto de fecha");
+      } else {
+        if (dateObj < new Date()) {
+          throw new Error("La fecha no puede ser menor a la fecha actual");
+        }
+      }
+    }
+    if (typeof guests !== "number") {
+      throw new Error("El numero de comensales debe ser un número entero");
+    } else {
+      if (guests < 1) {
+        throw new Error("El numero de comensales debe ser mayor a 0");
+      }
+    }
+
+    this.id = id;
+    this.customer = customer;
+    this.date = date;
+    this.guests = guests;
+  }
+
+  static validateReservation(date, guests) {
 
     if (typeof date !== "string") {
       console.log("La fecha debe ser una cadena de texto");
       return false;
-    } else {      
-        let dateObj = new Date(date);
-        if(isNaN(dateObj.getTime())){
-          console.log("La fecha no tiene el formato correcto de fecha");
+    } else {
+      let dateObj = new Date(date);
+      if (isNaN(dateObj.getTime())) {
+        console.log("La fecha no tiene el formato correcto de fecha");
+        return false;
+      }else{
+        if (dateObj < new Date()) {
+          console.log("La fecha no puede ser menor a la fecha actual");
           return false;
-        }      
+        }
+      }
     }
     if (typeof guests !== "number") {
       console.log("El numero de comensales debe ser un número entero");
       return false;
+    }else{
+      if (guests < 1) {
+        console.log("El numero de comensales debe ser mayor a 0");
+        return false;
+      }
     }
 
     return true;
   } //fin de metodo validate
 
-  constructor(id, customer, date, guests) {
-    if(Reservation.validate(id, customer, date, guests)){
-      this.id = id;
-      this.customer = customer;
-      this.date = date;
-      this.guests = guests      
-    }else{
-      throw new Error("La reserva no es válida");
-    }    
+  get info() {    
+    return  `La fecha de la reserva es: ${this.date.toLocaleString()} y el numero de comensales es: ${
+        this.guests
+      }`
+    ;
   }
-
-  get info() {
-    console.log(`La fecha de la reserva es: ${this.date.toLocaleString()} y el numero de comensales es: ${this.guests}`);
-  }
-
-
 }
 
 class Restaurant {
@@ -158,21 +184,20 @@ document
     }
   });
 
-// const restaurant = new Restaurant("El Lojal Kolinar");
-
-// const customer1 = new Customer(1, "Shallan Davar", "shallan@gmail.com");
-// const reservation1 = new Reservation(1, customer1, "2024-12-31T20:00:00", 4);
-
-// if (Reservation.validateReservation(reservation1.date, reservation1.guests)) {
-//   restaurant.addReservation(reservation1);
-//   restaurant.render();
-// } else {
-//   alert("Datos de reserva inválidos");
-// }
+const restaurant = new Restaurant("El Lojal Kolinar");
 
 const customer1 = new Customer(1, "Shallan Davar", "shallan@gmail.com");
-console.log(customer1.info);
-
 const reservation1 = new Reservation(1, customer1, "2024-12-31T20:00:00", 4);
-console.log(reservation1.info);
 
+if (Reservation.validateReservation(reservation1.date, reservation1.guests)) {
+  restaurant.addReservation(reservation1);
+  restaurant.render();
+} else {
+  alert("Datos de reserva inválidos");
+}
+
+// const customer1 = new Customer(1, "Shallan Davar", "shallan@gmail.com");
+// console.log(customer1.info);
+
+// const reservation1 = new Reservation(1, customer1, "2024-12-31T20:00:00", 4);
+// console.log(reservation1.info);
