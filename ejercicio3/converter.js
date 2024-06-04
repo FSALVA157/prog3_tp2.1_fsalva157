@@ -6,12 +6,46 @@ class Currency {
 }
 
 class CurrencyConverter {
-    constructor() {}
+    constructor() {
+        this.apiUrl = "api.frankfurter.app";
+        this.currencies = [];
+    }
 
-    getCurrencies(apiUrl) {}
+    async getCurrencies() {
+        const response = await fetch(`https://${this.apiUrl}/currencies`);
+        const data = await response.json();
+        //console.log(data);
+        Object.keys(data).map(key => {
+            //console.log(`${key}: ${data[key]}`);
+            this.currencies.push(new Currency(key, data[key]));
+        });
+        console.log(this.currencies);
+    }
 
-    convertCurrency(amount, fromCurrency, toCurrency) {}
+    async convertCurrency(amount, fromCurrency, toCurrency) {
+        if(fromCurrency.code === toCurrency.code) {
+            return amount;
+        }
+        try {
+            const response = await fetch(`https://${this.apiUrl}/latest?amount=${amount}&from=${fromCurrency.code}&to=${toCurrency.code}`);
+        const data = await response.json();
+        
+        
+        return data.rates[toCurrency.code];
+        
+        } catch (error) {
+            return null;
+        }
+        
+    }
 }
+
+// const test = new CurrencyConverter();
+// test.getCurrencies("api.frankfurter.app")
+// .then(()=>{
+//     test.convertCurrency(10, test.currencies[0], test.currencies[1]);
+// });
+// ;
 
 document.addEventListener("DOMContentLoaded", async () => {
     const form = document.getElementById("conversion-form");
