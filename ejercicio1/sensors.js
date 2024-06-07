@@ -15,11 +15,11 @@ class Sensor {
   }
 
   set id(id) {
-    let id_string = id.toString();
-    if (typeof id_string !== "string") {
-      throw new Error("El ID debe ser una cadena de texto");
-    }
-    this._id = id_string;
+    // let id_string = id.toString();
+    // if (typeof id_string !== "string") {
+    //   throw new Error("El ID debe ser una cadena de texto");
+    // }
+    this._id = id;
   }
 
   get name() {
@@ -80,16 +80,14 @@ class Sensor {
     this._updated_at = updated_at;
   }
 
-  set updateValue({ value, updated_at }) {
-    if (
-      typeof value === number &&
-      (typeof update_at === "string" || updated_at instanceof Date)
-    ) {
-      this.value = value;
-      this.updated_at = updated_at;
+  set updateValue(value) {
+    const value_aux = parseFloat(value);
+    if (typeof value_aux === 'number'){
+      this.value = value_aux;      
+      this.updated_at = new Date();
     } else {
       throw new Error(
-        "El valor debe ser un número decimal y la fecha debe ser una cadena de texto o una fecha"
+        "El valor debe ser un número decimal"
       );
     }
   }

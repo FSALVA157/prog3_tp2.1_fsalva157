@@ -19,7 +19,7 @@ class CurrencyConverter {
             //console.log(`${key}: ${data[key]}`);
             this.currencies.push(new Currency(key, data[key]));
         });
-        console.log(this.currencies);
+        //console.log(this.currencies);
     }
 
     async convertCurrency(amount, fromCurrency, toCurrency) {
@@ -35,17 +35,49 @@ class CurrencyConverter {
         
         } catch (error) {
             return null;
+        }        
+    }
+
+    //metodo que convierte la fecha al formato yyyy-mm-dd
+    getFecha(date){
+        let year = date.getFullYear();
+        let month = date.getMonth() + 1;
+        if(month < 10){
+            month = "0" + month;
         }
-        
+        let day = date.getDate();
+        if(day < 10){
+            day = "0" + day;
+        }
+        return `${year}-${month}-${day}`;
+    }
+
+    async getDifferenceYesterday(){
+        try {
+            let aux = new Date();            
+            const today = this.getFecha(aux);
+            aux.setDate(aux.getDate() - 1);
+            const yesterday = this.getFecha(aux);          
+            console.log(today, yesterday);
+
+             const resYesterday = await fetch(`https://${this.apiUrl}/${yesterday}`);
+             //const resYesterday = await fetch(`https://${this.apiUrl}/2024-06-03`);
+             const yesterdayValue = await resYesterday.json();
+            
+             const resToday = await fetch(`https://${this.apiUrl}/${today}`);
+             //const resToday = await fetch(`https://${this.apiUrl}/2024-06-04`);
+            const todayValue = await resToday.json();
+            console.log("------Valores de ayer y hoy--------")
+            console.log({yesterdayValue, todayValue});
+
+            
+        } catch (error) {
+            
+        }
     }
 }
 
-// const test = new CurrencyConverter();
-// test.getCurrencies("api.frankfurter.app")
-// .then(()=>{
-//     test.convertCurrency(10, test.currencies[0], test.currencies[1]);
-// });
-// ;
+
 
 document.addEventListener("DOMContentLoaded", async () => {
     const form = document.getElementById("conversion-form");
@@ -55,7 +87,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const converter = new CurrencyConverter("https://api.frankfurter.app");
 
+    
+
     await converter.getCurrencies();
+    await converter.getDifferenceYesterday();
     populateCurrencies(fromCurrencySelect, converter.currencies);
     populateCurrencies(toCurrencySelect, converter.currencies);
 

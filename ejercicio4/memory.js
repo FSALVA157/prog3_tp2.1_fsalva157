@@ -31,6 +31,20 @@ class Card {
         const cardElement = this.element.querySelector(".card");
         cardElement.classList.remove("flipped");
     }
+
+    toggleFlip(){
+        if (this.isFlipped) {
+            this.#unflip();
+            this.isFlipped = false;
+        } else {
+            this.#flip();
+            this.isFlipped = true;
+        }
+    }
+
+    matches(otherCard){
+        return this.name === otherCard.name;
+    }
 }
 
 class Board {
@@ -74,6 +88,29 @@ class Board {
             this.onCardClick(card);
         }
     }
+
+    shuffleCards(){
+        for (let i = this.cards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            let aux = this.cards[i];
+            this.cards[i] = this.cards[j];
+            this.cards[j] = aux;
+        }
+    }//fin metodo shuffleCards
+
+    flipDownAllCards(){
+        this.cards.forEach((card) => {
+            if(card.isFlipped){
+                card.toggleFlip();
+            }
+        });
+    }
+
+    reset(){
+        this.flipDownAllCards();
+        this.shuffleCards();
+        this.render();
+    }
 }
 
 class MemoryGame {
@@ -101,6 +138,27 @@ class MemoryGame {
                 setTimeout(() => this.checkForMatch(), this.flipDuration);
             }
         }
+    }
+
+    checkForMatch() {
+        console.log("antes del check")
+        console.log(this.flippedCards);
+        if(this.flippedCards[0].matches(this.flippedCards[1])){
+            this.flippedCards.forEach((card) => {
+                this.matchedCards.push(card);
+            });
+            }
+        this.flippedCards = [];            
+        console.log("flipped")
+        console.log(this.flippedCards);
+        console.log("matched")
+        console.log(this.matchedCards);
+    }
+
+    resetGame() {
+        this.board.reset();
+        this.flippedCards = [];
+        this.matchedCards = [];
     }
 }
 
